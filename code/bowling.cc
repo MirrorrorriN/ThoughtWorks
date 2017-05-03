@@ -23,54 +23,78 @@ int main(){
     vector<string> score;
     split(temp,score,"|");
     int n=score.size();
-    if(n>11){
-        score[n-2]=score[n-1];
-        score.pop_back();
-    }
-    else{
-        score.pop_back();
-    }
-    n=score.size();
-    if(n==11&&score[10].size()==2) n+=1;
-    vector<int> all(n);
-    vector<int> tag(n,0);
+    vector<int> all(10);
+    vector<int> ball;
+    vector<int> tag(10,0);
     for(int i=0;i<10;i++){
+        int t=0;
         if(score[i][0]=='X'){
+            ball.push_back(10); 
             all[i]=10;
             tag[i]=2;
+            continue;
         }
-        else if(score[i][1]=='/'){
+        if(score[i][0]=='-'){
+            ball.push_back(0);
+        }
+        else{
+            ball.push_back(score[i][0]-'0');
+            t+=(score[i][0]-'0');
+        }
+        if(score[i][1]=='/'){
+            ball.push_back(10-(score[i][0]-'0'));
             all[i]=10;
             tag[i]=1;
         }
+        else if(score[i][1]=='-'){
+            ball.push_back(0);
+            all[i]=t;
+        }
         else{
-            int t=0;
-            if(score[i][0]!='-') t+=score[i][0]-'0';
-            if(score[i][1]!='-') t+=score[i][1]-'0';
+            ball.push_back(score[i][1]-'0');
+            t+=(score[i][1]-'0');
             all[i]=t;
         }
     }
-    if(n>10){
-    if(score[10][0]=='X') all[10]=10;
-    else if(score[10][0]=='-') all[10]=0;
-    else all[10]=score[10][0]-'0';
-    if(n==12){
-        if(score[10][1]=='X') all[11]=10;
-        else if(score[10][1]=='/') all[11]=10-all[10];
-        else if(score[10][1]=='-') all[11]=0;
-        else all[11]=score[10][1]-'0';
-    }
-}
-
-    int res=0;
-    for(int i=0;i<10;i++){
-        if(tag[i]==2){
-            res+=(all[i]+all[i+1]+all[i+2]);
+    if(tag[9]!=0){
+        if(score[11][0]=='X'){
+            ball.push_back(10);
         }
-        else if(tag[i]==1){
-            res+=(all[i]+all[i+1]);
+        else if(score[11][0]=='-'){
+            ball.push_back(0);
         }
         else{
+            ball.push_back(score[11][0]-'0');
+        }
+        if(tag[9]==2){
+            if(score[11][1]=='X'){
+                ball.push_back(10);
+            }
+            else if(score[11][1]=='/'){
+                ball.push_back(10-score[11][0]+'0');
+            }
+            else if(score[11][1]=='-'){
+                ball.push_back(0);
+            }
+            else{
+                ball.push_back(score[11][1]-'0');
+            }
+        }
+    }
+
+    int res=0;
+    int index=0;
+    for(int i=0;i<10;i++){
+        if(tag[i]==2){
+            index+=1;
+            res+=(all[i]+ball[index]+ball[index+1]);
+        }
+        else if(tag[i]==1){
+            index+=2;
+            res+=(all[i]+ball[index]);
+        }
+        else{
+            index+=2;
             res+=all[i];
         }
         cout<<res<<endl;
